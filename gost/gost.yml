@@ -43,7 +43,7 @@ spec:
       containers:
       - env:
         - name: GOST_DB_HOST
-          value: 172.20.20.10
+          value: 172.20.20.12
         - name: GOST_MQTT_HOST
           value: mosquitto
         - name: GOST_SERVER_NAME
@@ -51,7 +51,7 @@ spec:
         - name: GOST_SERVER_EXTERNAL_URI
           value: http://localhost:32788/
         - name: GOST_DB_DATABASE
-          value: postgress
+          value: postgres
         - name: GOST_DB_USER
           value: postgres
         - name: GOST_DB_PASSWORD
@@ -60,6 +60,8 @@ spec:
           value: GOST
         - name: GOST_LOG_FILENAME 
           value: ""
+        - name: GOST_LOG_VERBOSE_FLAG
+          value: "TRUE"
         image: geodan/gost
         name: gost
         resources: {}
@@ -86,5 +88,5 @@ spec:
         name: gost-dashboard
         env:
           - name: GOST_WEBSOCKET_URL
-            value: wss://localhost:32788/ws
+            value: ws://localhost:32788/ws
       restartPolicy: Always

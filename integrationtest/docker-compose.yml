@@ -29,6 +29,7 @@ services:
         sed -i -e 's/localhost/kubernetes/g' config
         mkdir ~/.kube
         mv config ~/.kube/config
+        kubectl apply -f /project/traefik
         kubectl apply -f /project/gost
 
   kubernetes:
@@ -44,8 +45,6 @@ services:
       - "32789:32789"
     privileged: true
     mem_swappiness: 0
-    volumes:
-      - ./resolv.conf:/etc/resolv.conf
     networks:
       kubernetes-net:
         ipv4_address: 172.20.20.10

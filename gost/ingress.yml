@@ -1,0 +1,17 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: gost
+spec:
+  rules:
+    - host: localhost
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: gost-dashboard
+              servicePort: http
+          - path: /ws
+            backend:
+              serviceName: mosquitto
+              servicePort: http
