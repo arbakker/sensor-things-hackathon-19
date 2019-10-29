@@ -1,0 +1,44 @@
+version: '2.4'
+
+networks:
+  kubernetes-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.20.0/24
+          gateway: 172.20.20.1
+
+services:
+  kubernetes:
+    image: bsycorp/kind:latest-1.11 # K8s 1.11 is the version of K8s on docker UCP
+    ports:
+      - "8443:8443"
+      - "10080:10080"
+        # Forward the kind Docker-host
+      - "2375:2375"
+        # Forward the traefik-ingress nodeport
+      - "32788:32788"
+        # Forward the traefik-ingress dashboard port
+      - "32789:32789"
+    privileged: true
+    mem_swappiness: 0
+    networks:
+      kubernetes-net:
+        ipv4_address: 172.20.20.10
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:10080/kubernetes-ready"]
+      interval: 10s
+      timeout: 1s
+      retries: 60
+
+  db:
+    image: mdillon/postgis:10-alpine
+    restart: always
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'postgres'
+    networks:
+      kubernetes-net:
+        ipv4_address: 172.20.20.12
