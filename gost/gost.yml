@@ -1,0 +1,90 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gost
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+      name: http
+  selector:
+    app: gost
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gost-dashboard
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+      name: http
+  selector:
+    app: gost-dashboard
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gost
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gost
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: gost
+    spec:
+      containers:
+      - env:
+        - name: GOST_DB_HOST
+          value: 172.20.20.10
+        - name: GOST_MQTT_HOST
+          value: mosquitto
+        - name: GOST_SERVER_NAME
+          value: GOST Server
+        - name: GOST_SERVER_EXTERNAL_URI
+          value: http://localhost:32788/
+        - name: GOST_DB_DATABASE
+          value: postgress
+        - name: GOST_DB_USER
+          value: postgres
+        - name: GOST_DB_PASSWORD
+          value: postgres
+        - name: GOST_MQTT_PREFIX 
+          value: GOST
+        - name: GOST_LOG_FILENAME 
+          value: ""
+        image: geodan/gost
+        name: gost
+        resources: {}
+      restartPolicy: Always
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gost-dashboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gost-dashboard
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: gost-dashboard
+    spec:
+      containers:
+      - image: geodan/gost-dashboard 
+        name: gost-dashboard
+        env:
+          - name: GOST_WEBSOCKET_URL
+            value: wss://localhost:32788/ws
+      restartPolicy: Always

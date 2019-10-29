@@ -9,6 +9,28 @@ networks:
           gateway: 172.20.20.1
 
 services:
+  kubectl-init:
+    build:
+      context: .
+    volumes:
+      - ../:/project
+    depends_on:
+      kubernetes:
+        condition: service_healthy
+    networks:
+      - kubernetes-net
+    extra_hosts:
+      - "kubernetes:172.20.20.10"
+    entrypoint:
+      - bash
+      - -c
+      - |
+        wget http://kubernetes:10080/config
+        sed -i -e 's/localhost/kubernetes/g' config
+        mkdir ~/.kube
+        mv config ~/.kube/config
+        kubectl apply -f /project/gost
+
   kubernetes:
     image: bsycorp/kind:latest-1.11 # K8s 1.11 is the version of K8s on docker UCP
     ports:
@@ -22,6 +44,8 @@ services:
       - "32789:32789"
     privileged: true
     mem_swappiness: 0
+    volumes:
+      - ./resolv.conf:/etc/resolv.conf
     networks:
       kubernetes-net:
         ipv4_address: 172.20.20.10
