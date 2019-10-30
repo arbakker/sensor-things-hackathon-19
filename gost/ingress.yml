@@ -13,5 +13,5 @@ spec:
               servicePort: http
           - path: /ws
             backend:
-              serviceName: mosquitto
+              serviceName: mosquitto-http
               servicePort: http
