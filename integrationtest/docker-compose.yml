@@ -43,6 +43,8 @@ services:
       - "32788:32788"
         # Forward the traefik-ingress dashboard port
       - "32789:32789"
+        # Forward mqtt port
+      - "1883:1883"
     privileged: true
     mem_swappiness: 0
     networks:
